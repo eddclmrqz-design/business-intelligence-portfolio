@@ -2,14 +2,14 @@
 =====================================================
 SupportSphere Analytics Platform
 Project: Customer Support Operations Analytics Platform
-Description: Create all dimension and fact tables
+Description: Create Dimension and Fact Tables
 Author: Eddiecel Marquez
 =====================================================
 */
 
--- =====================================================
+-- ==========================================
 -- Dimension: Agent
--- =====================================================
+-- ==========================================
 
 CREATE TABLE support_ops.dim_agent (
 
@@ -31,9 +31,9 @@ CREATE TABLE support_ops.dim_agent (
 
 );
 
--- =====================================================
+-- ==========================================
 -- Dimension: Queue
--- =====================================================
+-- ==========================================
 
 CREATE TABLE support_ops.dim_queue (
 
@@ -49,9 +49,9 @@ CREATE TABLE support_ops.dim_queue (
 
 );
 
--- =====================================================
+-- ==========================================
 -- Dimension: Channel
--- =====================================================
+-- ==========================================
 
 CREATE TABLE support_ops.dim_channel (
 
@@ -61,9 +61,9 @@ CREATE TABLE support_ops.dim_channel (
 
 );
 
--- =====================================================
+-- ==========================================
 -- Dimension: Region
--- =====================================================
+-- ==========================================
 
 CREATE TABLE support_ops.dim_region (
 
@@ -73,9 +73,9 @@ CREATE TABLE support_ops.dim_region (
 
 );
 
--- =====================================================
+-- ==========================================
 -- Dimension: Status
--- =====================================================
+-- ==========================================
 
 CREATE TABLE support_ops.dim_status (
 
@@ -85,9 +85,9 @@ CREATE TABLE support_ops.dim_status (
 
 );
 
--- =====================================================
+-- ==========================================
 -- Dimension: Customer
--- =====================================================
+-- ==========================================
 
 CREATE TABLE support_ops.dim_customer (
 
@@ -103,19 +103,25 @@ CREATE TABLE support_ops.dim_customer (
 
 );
 
--- =====================================================
--- Fact Table: Case Journey
--- =====================================================
+-- ==========================================
+-- Fact: Case Journey
+-- ==========================================
 
 CREATE TABLE support_ops.fact_case_journey (
 
     case_key BIGSERIAL PRIMARY KEY,
 
-    case_id VARCHAR(40),
+    case_id VARCHAR(40) UNIQUE,
 
-    created_date DATE,
+    created_timestamp TIMESTAMP,
 
-    closed_date DATE,
+    assignment_timestamp TIMESTAMP,
+
+    first_response_timestamp TIMESTAMP,
+
+    response_received_timestamp TIMESTAMP,
+
+    closed_timestamp TIMESTAMP,
 
     agent_key INT,
 
@@ -128,6 +134,12 @@ CREATE TABLE support_ops.fact_case_journey (
     region_key INT,
 
     status_key INT,
+
+    priority_key INT,
+
+    shift_key INT,
+
+    team_key INT,
 
     irt_minutes NUMERIC(10,2),
 
@@ -145,22 +157,40 @@ CREATE TABLE support_ops.fact_case_journey (
 
     touches INT,
 
-    FOREIGN KEY (agent_key)
+    CONSTRAINT fk_agent
+        FOREIGN KEY (agent_key)
         REFERENCES support_ops.dim_agent(agent_key),
 
-    FOREIGN KEY (customer_key)
+    CONSTRAINT fk_customer
+        FOREIGN KEY (customer_key)
         REFERENCES support_ops.dim_customer(customer_key),
 
-    FOREIGN KEY (queue_key)
+    CONSTRAINT fk_queue
+        FOREIGN KEY (queue_key)
         REFERENCES support_ops.dim_queue(queue_key),
 
-    FOREIGN KEY (channel_key)
+    CONSTRAINT fk_channel
+        FOREIGN KEY (channel_key)
         REFERENCES support_ops.dim_channel(channel_key),
 
-    FOREIGN KEY (region_key)
+    CONSTRAINT fk_region
+        FOREIGN KEY (region_key)
         REFERENCES support_ops.dim_region(region_key),
 
-    FOREIGN KEY (status_key)
-        REFERENCES support_ops.dim_status(status_key)
+    CONSTRAINT fk_status
+        FOREIGN KEY (status_key)
+        REFERENCES support_ops.dim_status(status_key),
+
+    CONSTRAINT fk_priority
+        FOREIGN KEY (priority_key)
+        REFERENCES support_ops.dim_priority(priority_key),
+
+    CONSTRAINT fk_shift
+        FOREIGN KEY (shift_key)
+        REFERENCES support_ops.dim_shift(shift_key),
+
+    CONSTRAINT fk_team
+        FOREIGN KEY (team_key)
+        REFERENCES support_ops.dim_team(team_key)
 
 );
